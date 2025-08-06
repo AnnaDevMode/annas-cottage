@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instructions</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/animations.css" />
+</head>
+<body class="manualpage">
+  <!-- Starry background -->
+  <div class="stars-bg"></div>
+
+  <!-- Manual content -->
+  <div class="manual-container fade-in">
+    <h1>Instructions</h1>
+    <p class="manual-text">
+      To <strong>Rohit</strong>, my strong soldier,<br />
+      You have <strong>3 hearts</strong> and <strong>4 levels</strong> waiting ahead of you. <br /><br />
+       Fail once, lose a heart. <br /> Fail thrice, lose your soul.  <br /> <br />
+      If you win on your first try, you'll get... well, you'll see.<br /> If you lose then cry quietly and send me the vid.<br /><br />
+       There's no going back. I have removed the back button.<br /><br />
+      Small surprise waiting at the end :) <br />
+    </p>
+
+    <button class="continue-btn" id="begin-btn">Click to Continue</button>
+  </div>
+
+
+
+  <script>
+
+document.querySelector('.continue-btn').addEventListener('click', () => {
+  // Add fade out
+  document.querySelector('.welcome-container').classList.add('fade-out');
+
+  setTimeout(() => {
+    window.location.href = "manual.html";
+  }, 1000); // Wait for fade animation
+});
+
+
+   document.getElementById("begin-btn").addEventListener("click", () => {
+      document.querySelector(".manual-container").classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = "level1.html";
+      }, 1000);
+    });
+
+</script>
+
+
+<style>
+
+
+    .stars-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('assets/stars-bg.svg') repeat;
+  animation: starsMove 28s linear infinite;
+  opacity: 0.2;
+  z-index: -1;
+}
+
+@keyframes starsMove {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 1000px; }
+}
+
+body.manualpage{
+  background: black;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.manual-container {
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+  max-width: 700px;
+}
+
+.manual-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.continue-btn {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+  padding: 12px 24px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 15px;
+}
+
+.continue-btn:hover {
+  background: white;
+  color: black;
+}
+
+
+
+.fade-in {
+  animation: fadeIn 1.2s ease-out forwards;
+}
+
+.fade-out {
+  animation: fadeOut 1s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-30px); }
+}
+
+
+</style>
+
+
+
+
+
+</body>
+</html>

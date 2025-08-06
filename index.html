@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Anna's Cottage</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body class="homepage">
+  <div class="stars-bg"></div>
+  
+  <div class="welcome-container fade-in">
+    <h1>Welcome to <i>Anna's Cottage</i></h1>
+    <p class="dramatic-text"> Enter if you dare. Or don't. <br><br> I already locked the door :) </p>
+    <button class="continue-btn">Click to Continue</button>
+  </div>
+
+  <script>
+
+document.querySelector('.continue-btn').addEventListener('click', () => {
+  // Add fade out
+  document.querySelector('.welcome-container').classList.add('fade-out');
+
+  setTimeout(() => {
+    window.location.href = "manual.html";
+  }, 1000); // Wait for fade animation
+});
+
+
+   document.getElementById("begin-btn").addEventListener("click", () => {
+      document.querySelector(".manual-container").classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = "level1.html";
+      }, 1000);
+    });
+
+</script>
+
+
+  <style>
+
+
+
+.fade-in {
+  animation: fadeIn 1.2s ease-out forwards;
+}
+
+.fade-out {
+  animation: fadeOut 1s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-30px); }
+}
+
+    
+
+
+body.homepage {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+}
+
+.welcome-container {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  top: 30vh;
+  animation: fadeIn 2s ease;
+}
+
+.dramatic-text {
+  margin: 1rem auto;
+  max-width: 600px;
+  opacity: 0.9;
+}
+
+.continue-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+  border-radius: 15px;
+}
+
+.continue-btn:hover {
+  background-color: white;
+  color: black;
+}
+
+/* Simple animated star background */
+.stars-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('assets/stars-bg.svg') repeat;
+  animation: starsMove 28s linear infinite;
+  opacity: 0.2;
+  z-index: -1;
+}
+
+@keyframes starsMove {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 1000px; }
+}
+
+
+  </style>
+
+
+</body>
+</html>

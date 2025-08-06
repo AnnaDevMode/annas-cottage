@@ -1,0 +1,207 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fireworksssssssss</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      height: 100%;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .fade-in {
+      animation: fadeIn 1.2s ease-out forwards;
+    }
+
+    .fade-out {
+      animation: fadeOut 1s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to   { opacity: 0; transform: translateY(-30px); }
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🎆 Fireworks Canvas -->
+  <canvas id="fireworksCanvas"></canvas>
+
+  <!-- 🎵 Background Music (actual audio file) -->
+  <audio id="bg-music" source src="assets/youre-all-i-want.mp3" type="audio/mpeg"> preload="auto"></audio>
+
+  <script>
+
+  
+ window.addEventListener("DOMContentLoaded", () => {
+    const audio = document.getElementById("bg-music");
+
+    // Attempt to autoplay
+    audio.play().catch(() => {
+      console.log("Autoplay blocked. Tap to start music.");
+    });
+
+    // Enable audio on user interaction (e.g., click anywhere)
+    document.body.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play().catch((err) => {
+          console.error("Playback error:", err);
+        });
+      }
+    });
+  });
+
+
+
+    // 🎆 Fireworks Logic
+    const canvas = document.getElementById("fireworksCanvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+      constructor(x, y, color, angle, speed) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.radius = Math.random() * 2 + 1;
+        this.speedX = Math.cos(angle) * speed;
+        this.speedY = Math.sin(angle) * speed;
+        this.life = 100;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.speedY += 0.03;
+        this.life--;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+
+    class Firework {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.targetY = Math.random() * canvas.height / 2;
+        this.speedY = -(Math.random() * 3 + 4);
+        this.exploded = false;
+        this.particles = [];
+        this.color = "white";
+      }
+
+      update() {
+        if (!this.exploded) {
+          this.y += this.speedY;
+          if (this.y <= this.targetY) {
+            this.explode();
+            this.exploded = true;
+          }
+        } else {
+          this.particles.forEach((p) => p.update());
+        }
+      }
+
+      draw() {
+        if (!this.exploded) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        } else {
+          this.particles.forEach((p) => p.draw());
+        }
+      }
+
+      explode() {
+        for (let i = 0; i < 50; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 5 + 1;
+          this.particles.push(new Particle(this.x, this.y, this.color, angle, speed));
+        }
+      }
+    }
+
+    let fireworks = [];
+
+    function animate() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (Math.random() < 0.05) {
+        fireworks.push(new Firework());
+      }
+
+      fireworks.forEach((f, index) => {
+        f.update();
+        f.draw();
+        if (f.exploded && f.particles.every((p) => p.life <= 0)) {
+          fireworks.splice(index, 1);
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    // 🎵 Autoplay audio on load with fade-in
+    window.addEventListener("load", () => {
+      const audio = document.getElementById("bg-music");
+      let volume = 0;
+      audio.volume = volume;
+
+      // Try to autoplay
+      audio.play().catch((e) => {
+        console.warn("Autoplay blocked, waiting for user interaction.");
+      });
+
+      // Gradually fade in volume
+      let fadeIn = setInterval(() => {
+        if (volume < 1) {
+          volume += 0.01;
+          audio.volume = volume;
+        } else {
+          clearInterval(fadeIn);
+        }
+      }, 200); // ~2 seconds total
+    });
+  </script>
+
+</body>
+</html>
+

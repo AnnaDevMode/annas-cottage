@@ -1,0 +1,507 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Level 3</title>
+  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/animations.css" />
+</head>
+<body class="level3">
+  <div class="stars-bg"></div>
+
+  <!-- Level intro -->
+  <div class="level-intro-text" id="levelIntro">Level 2</div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="manual.html">Manual</a></li>
+      <li class="active">Level 1</li>
+      <li class="active">Level 2</li>
+      <li class="active">Level 3</li>
+      <li class="disabled">Level 4</li>
+      
+    </ul>
+    <div class="hearts-container" id="hearts"></div>
+  </nav>
+
+  <!-- Game Box -->
+ <div class="gamebox">
+    
+  <main class="level-content">
+  <h2 class="level-title">Level 3: Flash My Love</h2>
+  <p class="game-desc">Remember the pattern Sweetheart</p>
+
+  <div class="flash-grid">
+      <div class="flash-box" data-index="0"></div>
+      <div class="flash-box" data-index="1"></div>
+      <div class="flash-box" data-index="2"></div>
+      <div class="flash-box" data-index="3"></div>
+    </div>
+
+     <p id="feedback" class="feedback-msg">Good Luck ;) </p>
+      <button id="start-btn" class="start-btn">Start</button>
+      <button id="next-btn" style="display:none;" onclick="window.location.href='level4.html'">Continue to Level 4</button>
+    </div>
+  </main>
+
+  <script>// === Heart Logic (Persistent) ===
+function unlockNextLevel(level) {
+  localStorage.setItem('levelReached', level);
+}
+
+function getHearts() {
+  const stored = localStorage.getItem('hearts');
+  return stored !== null ? parseInt(stored) : 3;
+}
+
+function setHearts(value) {
+  localStorage.setItem('hearts', value);
+}
+
+function renderHearts() {
+  const container = document.getElementById('hearts');
+  const hearts = getHearts();
+  container.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const img = document.createElement('img');
+    img.src = 'assets/heart.svg';
+    img.className = 'heart';
+    if (i >= hearts) img.classList.add('lost');
+    container.appendChild(img);
+  }
+}
+
+function loseHeart(msg) {
+  let hearts = getHearts();
+  if (hearts > 0) {
+    hearts--;
+    setHearts(hearts);
+    renderHearts();
+    document.getElementById('feedback').textContent = msg;
+  }
+
+  if (hearts <= 0) {
+    setTimeout(() => {
+      alert("You have lost your soul");
+      setHearts(3);
+      window.location.href = "level1.html";
+    }, 1000);
+  }
+}
+
+window.addEventListener("DOMContentLoaded", renderHearts);
+
+
+// === Confetti ===
+function showConfetti() {
+  for (let i = 0; i < 30; i++) {
+    const dot = document.createElement("div");
+    dot.className = "confetti";
+    dot.style.left = `${Math.random() * 100}%`;
+    dot.style.animationDuration = `${Math.random() * 2 + 1.5}s`;
+    dot.style.background = `hsl(${Math.random() * 360}, 80%, 70%)`;
+    document.body.appendChild(dot);
+    setTimeout(() => dot.remove(), 3000);
+  }
+}
+
+const flashBoxes = document.querySelectorAll('.flash-box');
+const startBtn = document.getElementById('start-btn');
+const feedback = document.getElementById('feedback');
+const nextBtn = document.getElementById('next-btn');
+
+let sequence = [];
+let playerInput = [];
+let round = 1;
+let isPlayerTurn = false;
+
+function startGame() {
+  round = 1;
+  sequence = [];
+  playerInput = [];
+  isPlayerTurn = false;
+  feedback.textContent = '';
+  nextBtn.style.display = 'none';
+  startBtn.style.display = 'none';
+  startRound();
+}
+
+function startRound() {
+  const flashes = 5 + (round - 1) * 2; // 5, 7, 9, 11
+  sequence = [];
+  isPlayerTurn = false;
+  playerInput = [];
+
+  for (let i = 0; i < flashes; i++) {
+    const index = Math.floor(Math.random() * 4);
+    sequence.push(index);
+  }
+
+  showSequence(sequence, 0);
+}
+
+function showSequence(seq, i) {
+  if (i >= seq.length) {
+    setTimeout(() => {
+      feedback.textContent = 'Click accordingly!';
+      isPlayerTurn = true;
+    }, 500);
+    return;
+  }
+
+  const idx = seq[i];
+  const box = flashBoxes[idx];
+  box.classList.add('flash');
+
+  setTimeout(() => {
+    box.classList.remove('flash');
+    setTimeout(() => showSequence(seq, i + 1), 600 - round * 50); // Slightly faster each round
+  }, 400);
+}
+
+flashBoxes.forEach((box, index) => {
+  box.addEventListener('click', () => {
+    if (!isPlayerTurn) return;
+
+    const correctIndex = sequence[playerInput.length];
+    if (index === correctIndex) {
+      box.classList.add('correct');
+      setTimeout(() => box.classList.remove('correct'), 300);
+      playerInput.push(index);
+
+      if (playerInput.length === sequence.length) {
+        isPlayerTurn = false;
+        feedback.textContent = '';
+        if (round < 4) {
+          round++;
+          setTimeout(startRound, 1000);
+        } else {
+          feedback.textContent = "Yayyyyy my baby did itttttt";
+          showConfetti();
+          nextBtn.style.display = 'block';
+        }
+      }
+    } else {
+      box.classList.add('wrong');
+      setTimeout(() => box.classList.remove('wrong'), 400);
+      loseHeart("FOCUS ROHIT!!!");
+      isPlayerTurn = false;
+      setTimeout(startGame, 1500);
+    }
+  });
+});
+
+startBtn.addEventListener('click', startGame);
+
+
+  </script>
+
+
+
+<style>
+
+    
+@keyframes confetti {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(400px) rotate(720deg); }
+}
+
+
+@keyframes confetti-fall {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(500px) rotate(720deg); }
+}
+
+
+
+    /* Simple animated star background */
+.stars-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('assets/stars-bg.svg') repeat;
+  animation: starsMove 28s linear infinite;
+  opacity: 0.2;
+  z-index: -1;
+}
+
+@keyframes starsMove {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 1000px; }
+}
+
+
+
+/* Level3 */
+
+
+.level-intro-text {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 4rem;
+  font-weight: 700;
+  color: white;
+  z-index: 10;
+  opacity: 0;
+  animation: introSlide 2.5s ease forwards;
+}
+
+body.level3{
+  background: black;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  color: white;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+
+/* Nav Bar */
+.navbar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 3;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  font-size: 0.85rem;
+}
+
+.nav-links li {
+  padding: 6px 10px;
+  border: 1px solid white;
+  border-radius: 5px;
+  cursor: default;
+  opacity: 0.6;
+}
+
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.nav-links li.active {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  opacity: 1;
+}
+
+.nav-links li:not(.active):hover {
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  opacity: 1;
+}
+
+.nav-links li:not(.active):hover a {
+  color: black;
+}
+
+.nav-links li.disabled {
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+
+
+/* core level 1 parts */
+.level-content {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.gamebox {
+  border: 2px solid white;
+  padding: 2rem;
+  border-radius: 12px;
+  background-color: rgba(255,255,255,0.05);
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+  max-width: 600px;
+  margin: auto;
+}
+
+.game-instruction {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+/* Flash grid wrapper */
+.flash-grid {
+ display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.flash-box {
+  width: 100px;
+  height: 100px;
+   background-color: #333;
+  border: 3px solid white;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.flash-box.flash {
+   background-color: #ffffff !important;
+  box-shadow: 0 0 30px 15px #ffffff;
+  transition: all 0.1s ease;
+}
+
+@keyframes flashGlow {
+  0% {
+    background-color: #fff;
+    box-shadow: 0 0 12px 6px rgba(255, 255, 255, 0.6);
+  }
+  100% {
+    background-color: #333;
+    box-shadow: none;
+  }
+}
+
+.flash-box.flash {
+  animation: flashGlow 0.4s ease;
+}
+
+
+.flash-box.correct {
+  background-color: #8fff98;
+}
+
+.flash-box.wrong {
+  background-color: #ff8f8f;
+}
+
+#start-btn {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#startBtn:hover {
+  background-color: aliceblue;
+  color: #000;
+}
+
+
+
+#next-btn {
+   margin-top: 2rem;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  background: white;
+  color: black;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  justify-content: center;
+}
+
+
+#gameMessage {
+  font-family: 'Georama', sans-serif;
+  color: white;
+  margin-top: 10px;
+}
+
+
+
+
+.confetti {
+  position: fixed;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  z-index: 999;
+  border-radius: 50%;
+  animation: confetti 3s ease-in-out forwards;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+/* Hearts Container */
+.hearts-container {
+  position: fixed;
+  top: 20px;
+  right: 40px;
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+/* Each Heart */
+.heart {
+  width: 25px;
+  height: 25px;
+  filter: drop-shadow(0 0 3px white);
+  transition: transform 0.2s ease;
+}
+
+.heart.lost {
+  opacity: 0.2;
+  filter: grayscale(1);
+}
+
+
+.fade-in {
+  animation: fadeIn 1.2s ease-out forwards;
+}
+
+.fade-out {
+  animation: fadeOut 1s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-30px); }
+}
+
+
+
+
+
+</style>
+</body>
+</html>
+
+
